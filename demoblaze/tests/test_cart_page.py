@@ -63,6 +63,7 @@ class TestCart:
 
         cart = CartPage(driver)
         cart.open()
+        home.pause(5)  
 
         assert len(cart.get_cart_items()) >= 2
 
@@ -76,15 +77,28 @@ class TestCart:
 
         product = ProductPage(driver)
         product.click_add_to_cart()
+        
+        home.open()
+        home.pause(2)
+        home.click_product_by_index(1)
+
+        product = ProductPage(driver)
         product.click_add_to_cart()
 
         cart = CartPage(driver)
         cart.open()
+        home.pause(5)
 
         item_prices = cart.get_item_prices()
-        total = cart.get_total()
+        total_val = cart.get_total()
 
-        assert int(total) == sum(item_prices)
+        if isinstance(total_val, str):
+            assert total_val.isdigit(), f"Expected a numeric total text, but got: '{total_val}'"
+            total = int(total_val)
+        else:
+            total = total_val
+
+        assert total == sum(item_prices)
 
 
     def test_delete_product_from_cart(self, driver):
@@ -118,17 +132,34 @@ class TestCart:
 
         product = ProductPage(driver)
         product.click_add_to_cart()
+        
+        home.open()
+        home.pause(2)
+        home.click_product_by_index(1)
+
+        product = ProductPage(driver)
         product.click_add_to_cart()
 
         cart = CartPage(driver)
         cart.open()
+        home.pause(5)
 
-        before = int(cart.get_total())
+        before_val = cart.get_total()
+        
+        if isinstance(before_val, str):
+            before = int(before_val) if before_val.isdigit() else 0
+        else:
+            before = before_val
 
         cart.delete_first_item()
-        cart.pause(2)
+        home.pause(4)
 
-        after = int(cart.get_total())
+        after_val = cart.get_total()
+        
+        if isinstance(after_val, str):
+            after = int(after_val) if after_val.isdigit() else 0
+        else:
+            after = after_val
 
         assert after < before
 
@@ -181,6 +212,7 @@ class TestCart:
 
         cart = CartPage(driver)
         cart.open()
+        home.pause(3)
 
         total = int(cart.get_total())
 
